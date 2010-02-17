@@ -71,18 +71,14 @@ def method(dispatchval):
         The multimethod is determined by taking the method's name up to the last occurence
         of '__', e.g. function foo_bar__zig will become a method on the foo_bar multimethod.'''
 
-        if '__' not in func.__name__:
-            raise ValueError("Method name must contain '__' to separate multimethod name from suffix")
-
-        mm_name = func.__name__.rsplit('__', 1)[0]
         try:
-            multim = MultiMethod.instances[mm_name]
+            multim = MultiMethod.instances[func.__name__]
         except KeyError:
             raise KeyError("Multimethod '%s' not found; it must exist before methods can be added")
 
         multim.addmethod(func, dispatchval)
 
-        return func
+        return multim
 
     return method_decorator
 
