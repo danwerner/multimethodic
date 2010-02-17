@@ -10,6 +10,7 @@ Copyright (C) 2010-2011 by Daniel Werner.
 See the README file for information on usage and redistribution.
 '''
 
+from types import UnboundMethodType
 
 class DefaultMethod(object):
     def __repr__(self):
@@ -73,9 +74,17 @@ def method(dispatchval):
         except KeyError:
             raise KeyError("Multimethod '%s' not found; it must exist before methods can be added")
 
-        multim.addmethod(func, dispatchval)
+        if isinstance(func, UnboundMethodType):
+            # If a function is declared in a class definition, Python will turn
+            # it into an instance method. Since we wish to return a different
+            # callable, we have to turn it into an instance method ourselves.
+            wrapper = UnboundMethodType(multim, None, func.__class__)
+            multim.addmethod(func, dispatchval)
+            return wrapper
 
-        return multim
+        else:
+            multim.addmethod(func, dispatchval)
+            return multim
 
     return method_decorator
 
