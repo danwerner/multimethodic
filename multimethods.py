@@ -26,7 +26,7 @@ class MultiMethod(object):
             raise TypeError('dispatchfn must be callable')
 
         if name in self.__class__.instances:
-            raise Exception("Multimethod named %s already exists, "
+            raise Exception("A multimethod '%s' already exists, "
                             "redeclaring it would wreak havoc" % name)
 
         self.dispatchfn = dispatchfn
@@ -43,12 +43,11 @@ class MultiMethod(object):
         if Default in self.methods:
             return self.methods[Default](*args, **kwds)
 
-        raise ValueError("No matching method on %s and no default "
-                         "method defined" % self.__name__)
+        raise ValueError("No matching method on multimethod '%s' and "
+                         "no default method defined" % self.__name__)
 
     def addmethod(self, func, dispatchval):
         self.methods[dispatchval] = func
-        func.multimethod = self
 
     def getmethod(self, dispatchval):
         return self.methods[dispatchval]
