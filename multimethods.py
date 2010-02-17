@@ -2,58 +2,21 @@
 
 ''' Multimethods
 
-A multimethod implementation for Python, inspired by Clojure's multimethod
-support. Thanks to Rich Hickey for proving how useful they are. :-)
+An implementation of multimethods for Python, heavily influenced by
+the Clojure programming language.
 
-Example:
+Copyright (C) 2010 by Daniel Werner.
 
-from multimethods import MultiMethod, method, Default
-
->>> def sign_dispatch(x, y):
-        if y > 0: return 1
-        elif y == 0: return 0
-        return 'bar'
-
->>> sign = MultiMethod('sign', sign_dispatch)
-
->>> @method(1)
-    def sign__pos(x, y):
-    print "y was positive"
-
->>> @method(0)
-    def sign__zero(x, y):
-        print "y was zero"
-
->>> @method(Default)
-    def sign__def(x, y):
-        print "y was something else"
-
->>> sign(1, 1)
-y was positive
-
->>> sign(1, 99)
-y was positive
-
->>> sign(1, 0)
-y was zero
-
->>> sign(1, -12)
-y was something else
-
->>> sign('foo', None)
-y was something else
+See the README file for information on usage and redistribution.
 '''
 
-__author__ = 'Daniel Werner'
-
-from decorator import decorator
 
 class DefaultMethod(object):
     def __repr__(self):
         return '<DefaultMethod>'
 
-
 Default = DefaultMethod()
+
 
 class MultiMethod(object):
     instances = {}

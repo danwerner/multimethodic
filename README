@@ -1,0 +1,142 @@
+Multimethods for Python
+-----------------------
+
+This module adds multimethod support to the Python programming language.
+Multimethods provide a mechanism to dispatch function execution to different
+implementations of this function. It works similarly to the well-known concept
+of "instance methods" in OO languages like Python, which in a call to
+obj.method() would look up a member called "method" in obj's class.
+
+However, multimethod methods are NOT neccessarily associated with a single
+class. Instead, they belong to a MultiMethod instance. Calls on the MultiMethod
+will be dispatched to its corresponding methods using a custom, user-defined
+dispatch function.
+
+The dispatch function can be any callable. Once a MultiMethod is called, the
+dispatch function will receive the exact arguments the MultiMethod call
+received, and is expected to return a value that will be dispatched on. This
+return value is then used to select a method that must have previously been
+associated with the MultiMethod.
+
+Note that in the dispatch function lies the power of this whole concept.  You
+can use it to dispatch on the type of the arguments like in Java/C, or on their
+exact values. If the arguments are dictionaries, you can dispatch on whether
+they contain certain keys. Or, you could even send them over the network to
+a remote service and let that decide which method to call.
+
+Of course, not every possible application of multimethods is actually useful,
+but your creativity is the only real limit on what you can do.
+
+
+How to use multimethods
+-----------------------
+
+To use a multimethod, it must be instantiated first. Each MultiMethod
+instance takes a name and a dispatch function, as discussed above.
+
+Methods are associated with MultiMethods by decorating a function (or, class)
+with the @method decorator. The @method decorator takes a MultiMethod's name as
+a string, and a dispatch value. The dispatch value signals to the MultiMethod
+that whenever its dispatch function returns this value, the decorated method
+should be selected.
+
+Selecting the MultiMethod instance to couple the method with involves quite
+a bit of magic at the moment. The function which is going to be turned into
+a method must have a name of '<multimethod>__<suffix>', where multimethod is
+the name given to the MultiMethod constructor, and suffix is any string for
+your convenience. Note that a MultiMethod of this name must already exist.
+
+Okay, that was dry enough. Let's put this concept to work with a small example:
+
+
+Example: Dispatch on Argument Type
+----------------------------------
+
+A naive implementation of two different algorithms that should be selected
+based on a value's type could look like this:
+
+  def combine(x, y):
+      if isinstance(x, int) and isinstance(y, int):
+          return x*y
+      elif isinstance(x, basestring) and isinstance(y, basestring):
+          return x + ', ' + y
+      else:
+          return None
+
+However, this is ugly and becomes unwieldy fast as we add more elif cases for
+additional types. Fortunately, implementing dispatch on function arguments'
+types is easy using multimethods. Let's implement a multimethod version of
+combine() with exactly the same signature.
+
+First, we have to define a dispatch function. It will take the same arguments
+as the multimethod, return a value which is then used to select the correct
+method implementation:
+
+  def combine_dispatch(x, y):
+      return (type(x), type(y))
+
+Thus, we are going to dispatch on a tuple of types, reflecting the types of the
+arguments. The next step is to instantiate the MultiMethod itself, taking our
+previous combine function's place:
+
+  from multimethod import MultiMethod, method, Default
+
+  combine = MultiMethod('combine', combine_dispatch)
+
+A multimethod by itself does almost nothing. It is dependent on being given
+methods in order to implement its functionality for different dispatch values.
+Let's define methods for all-integer and all-string cases as above:
+
+  @method((int, int))
+  def combine__ii(x, y):
+      return x*y
+
+  @method((basestring, basestring))
+  def combine__ss(x, y):
+      return x + ', ' + y
+
+  @method(Default)
+  def combine__def(x, y):
+      return None
+
+Notice the last method above. Instead of specifying a tuple of types, we have
+given it the special multimethods.Default object. This is a marker which simply
+tells the multimethod, "in case we don't have a method implementation for any
+dispatch value, just use this method instead."  Default methods are completely
+optional, though -- you are free not to define one.
+
+Now would be a good time to show that the dispatch function's signature doesn't
+have to match methods' signature bit-by-bit. Let's refactor the dispatch
+function and make it more generic:
+
+  def dispatch_on_arg_type(*args):
+    return tuple(type(x) for x in args)
+
+This version will support all possible (non-keyword) signatures at no
+additional cost, and makes it easy to re-use the dispatch function for other
+multimethods with different numbers of arguments.
+
+
+Author & License
+----------------
+
+This work has been created by and is copyrighted by Daniel Werner. All rights
+reserved, and that kind of stuff. You may freely use this work under the terms
+of the simplified (2-clause) version of the BSD license, a copy of which is
+included in this distribution.
+
+
+Credits & Thanks
+----------------
+
+While this Python module is new, the idea of multimethods is definitely not.
+Common Lisp has its generic functions, which only dispatch on type (and eql).
+There has also been a prior Python implementation by Guido Rossum, which is
+even more limited.
+
+This module however is really a near-faithful implementation of multimethods as
+found in the Clojure programming language (http://clojure.org), sans beautiful
+macro-based syntax.  I'd like to thank the principal author of Clojure, Rich
+Hickey, for coming up with the idea to generalize multimethods to use a custom
+dispatch function, and for publishing his implementation so people can come
+along and rip...err... port it to other languages. Thanks, Rich!
