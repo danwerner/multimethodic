@@ -43,14 +43,11 @@ class MultiMethod(object):
         if Default in self.methods:
             return self.methods[Default](*args, **kwds)
 
-        raise ValueError("No matching method on multimethod '%s' and "
-                         "no default method defined" % self.__name__)
+        raise Exception("No matching method on multimethod '%s' and "
+                        "no default method defined" % self.__name__)
 
     def addmethod(self, func, dispatchval):
         self.methods[dispatchval] = func
-
-    def getmethod(self, dispatchval):
-        return self.methods[dispatchval]
 
     def removemethod(self, dispatchval):
         del self.methods[dispatchval].multimethod
