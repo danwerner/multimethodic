@@ -15,36 +15,32 @@ dispatch function.
 The dispatch function can be any callable. Once a MultiMethod is called, the
 dispatch function will receive the exact arguments the MultiMethod call
 received, and is expected to return a value that will be dispatched on. This
-return value is then used to select a method that must have previously been
-associated with the MultiMethod.
+return value is then used to select a 'method', which is basically just
+a function that has been associated with this multimethod and dispatch value
+using the @method decorator.
 
-Note that in the dispatch function lies the power of this whole concept.  You
-can use it to dispatch on the type of the arguments like in Java/C, or on their
-exact values. If the arguments are dictionaries, you can dispatch on whether
-they contain certain keys. Or, you could even send them over the network to
-a remote service and let that decide which method to call.
+Note that in the dispatch function lies the real power of this whole concept.
+For example, you can use it to dispatch on the type of the arguments like in
+Java/C, on their exact values, or whether they evaluate to True in a boolean
+context. If the arguments are dictionaries, you can dispatch on whether they
+contain certain keys. Or, if you're going really wild, you could even send them
+over the network to a remote service and let that decide which method to call.
 
 Of course, not every possible application of multimethods is actually useful,
-but your creativity is the only real limit on what you can do.
+but your creativity is the only limit to what you can do.
 
 
 How to use multimethods
 -----------------------
 
-To use a multimethod, it must be instantiated first. Each MultiMethod
-instance takes a name and a dispatch function, as discussed above.
+To use multimethods, a MultiMethod instance must be created first. Each
+MultiMethod instance takes a name and a dispatch function, as discussed above.
 
-Methods are associated with MultiMethods by decorating a function (or, class)
-with the @method decorator. The @method decorator takes a MultiMethod's name as
-a string, and a dispatch value. The dispatch value signals to the MultiMethod
-that whenever its dispatch function returns this value, the decorated method
-should be selected.
-
-Selecting the MultiMethod instance to couple the method with involves quite
-a bit of magic at the moment. The function which is going to be turned into
-a method must have a name of '<multimethod>__<suffix>', where multimethod is
-the name given to the MultiMethod constructor, and suffix is any string for
-your convenience. Note that a MultiMethod of this name must already exist.
+Methods are associated with MultiMethods by decorating a function with the
+@method decorator. The function needs to have the same name as the MultiMethod.
+The @method decorator takes a dispatch value which signals to the MultiMethod
+that whenever its dispatch function returns this value, this method should be
+selected.
 
 Okay, that was dry enough. Let's put this concept to work with a small example:
 
@@ -52,12 +48,12 @@ Okay, that was dry enough. Let's put this concept to work with a small example:
 Example: Dispatch on Argument Type
 ----------------------------------
 
-A naive implementation of two different algorithms that should be selected
-based on a value's type could look like this:
+Without multimethods, naively implementing a function that has two different
+behaviours based on a the types of the arguments could look like this:
 
   def combine(x, y):
       if isinstance(x, int) and isinstance(y, int):
-          return x*y
+          return x * y
       elif isinstance(x, basestring) and isinstance(y, basestring):
           return x + ', ' + y
       else:
@@ -69,15 +65,14 @@ types is easy using multimethods. Let's implement a multimethod version of
 combine() with exactly the same signature.
 
 First, we have to define a dispatch function. It will take the same arguments
-as the multimethod, return a value which is then used to select the correct
+as the multimethod, and return a value which is then used to select the correct
 method implementation:
 
   def combine_dispatch(x, y):
       return (type(x), type(y))
 
-Thus, we are going to dispatch on a tuple of types, reflecting the types of the
-arguments. The next step is to instantiate the MultiMethod itself, taking our
-previous combine function's place:
+Thus, we are going to dispatch on a tuple of types, namely the types of our
+arguments. The next step is to instantiate the MultiMethod itself:
 
   from multimethod import MultiMethod, method, Default
 
@@ -88,22 +83,34 @@ methods in order to implement its functionality for different dispatch values.
 Let's define methods for all-integer and all-string cases as above:
 
   @method((int, int))
-  def combine__ii(x, y):
+  def combine(x, y):
       return x*y
 
-  @method((basestring, basestring))
-  def combine__ss(x, y):
-      return x + ', ' + y
+  @method((str, str))
+  def combine(x, y):
+      return x + '&' + y
 
   @method(Default)
-  def combine__def(x, y):
-      return None
+  def combine(x, y):
+      return 'Eh?'
 
-Notice the last method above. Instead of specifying a tuple of types, we have
-given it the special multimethods.Default object. This is a marker which simply
-tells the multimethod, "in case we don't have a method implementation for any
-dispatch value, just use this method instead."  Default methods are completely
-optional, though -- you are free not to define one.
+The behaviour for ints and strings is straightforward:
+
+  >>> combine(21, 2)
+  42
+  >>> combine('foo', 'bar')
+  'foo&bar'
+
+However, notice the last method definition above. Instead of specifying a tuple
+of types, we have given it the special multimethods.Default object. This is
+a marker which simply tells the multimethod: "In case we don't have a method
+implementation for some dispatch value, just use this method instead."
+
+  >>> combine(21, 'bar')
+  'Eh?'
+
+Default methods are completely optional, you are free not to provide one at
+all. An Exception will be raised for unknown dispatch values instead.
 
 Now would be a good time to show that the dispatch function's signature doesn't
 have to match methods' signature bit-by-bit. Let's refactor the dispatch
@@ -112,9 +119,29 @@ function and make it more generic:
   def dispatch_on_arg_type(*args):
     return tuple(type(x) for x in args)
 
-This version will support all possible (non-keyword) signatures at no
-additional cost, and makes it easy to re-use the dispatch function for other
-multimethods with different numbers of arguments.
+This version will support all possible (non-variadic, non-keyword) signatures
+at no additional cost, and makes it easy to re-use the dispatch function for
+other multimethods with different numbers of arguments.
+
+
+Caveat
+------
+
+A small stumbling block remains when dispatching on argument type: Comparing
+dispatch values is done via ==, not via isinstance(). This is best explained
+using the string-concatenating combine() implementation from above:
+
+  @method((basestring, basestring))
+  def combine(x, y):
+      return x + '&' + y
+
+  >>> combine('foo', 'bar')   # BREAKS!
+
+This fails because type('foo') returns str, not basestring. I haven't found
+a way yet to allow this to work, short of checking all dispatch values for
+isinstance-ness in linear time or adding special cases to the code. If you have
+an idea how to implement this, great -- please contant me, or better yet,
+attach a patch :-)
 
 
 Author & License
