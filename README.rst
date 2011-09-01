@@ -136,7 +136,7 @@ other multimethods with different numbers of arguments.
 
 
 Caveat
-------
+******
 
 A small stumbling block remains when dispatching on argument type: Comparing
 dispatch values is done via ==, not via isinstance(). This is best explained
@@ -153,6 +153,51 @@ a way yet to allow this to work, short of checking all dispatch values for
 isinstance-ness in linear time or adding special cases to the code. If you have
 an idea how to implement this, great -- please contact me, or better yet,
 attach a patch :-)
+
+
+Example: Poor man's pattern matching
+------------------------------------
+
+What follows is a horribly inefficient algorithm to determine a list's length.
+It is often used as an example to teach basic recursion.
+
+::
+
+    from multimethods import MultiMethod, method, Default
+
+    identity = lambda x: x
+    len2 = MultiMethod('len2', identity)
+
+    @method([])
+    def len2(l):
+        return 0
+
+    @method(Default)
+    def len2(l):
+        return 1 + len2(l[1:])
+
+
+Example: Dispatch on number sign
+--------------------------------
+
+::
+
+    from multimethods import MultiMethod, method, Default
+    
+    def signum(x):
+      "Returns -1, 0 or 1 to represent the sign of `x`."
+      return int(x >= 0) + int(x > 0) - 1
+
+    show_sign = MultiMethod('show_sign', signum)
+
+    @show_sign(-1)
+    def show_sign(x): print "%s is negative" % x
+
+    @show_sign(0)
+    def show_sign(x): print "%s is zero" % x
+
+    @show_sign(1)
+    def show_sign(x): print "%s is positive" % x
 
 
 Author & License
