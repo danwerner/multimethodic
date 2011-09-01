@@ -159,7 +159,8 @@ Example: Poor man's pattern matching
 ------------------------------------
 
 What follows is a horribly inefficient algorithm to determine a list's length.
-It is often used as an example to teach basic recursion.
+It is often used as an example to teach basic recursion, and also goes to show
+how the edge case can be modeled using simple pattern matching.
 
 ::
 
@@ -205,7 +206,7 @@ this as code without resorting to heaps of `if` statements?
     @method("Wile E.")
     def calc_total(purchase):
         # Always gets 20% off
-        return sum_amounts(purchase * 0.8)
+        return sum_amounts(purchase) * 0.8
 
     @method("Wolfram & Hart")
     def calc_total(purchase):
