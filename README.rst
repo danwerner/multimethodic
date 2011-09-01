@@ -1,7 +1,16 @@
 Multimethods for Python
 =======================
 
-This module adds multimethod support to the Python programming language.
+This module adds multimethod support to the Python programming language. In
+contrast to other multiple dispatch implementations, this one doesn't strictly
+dispatch on argument types, but on a user-provided dispatch function that can
+differ for each multimethod. This design is inspired the Clojure programming
+language's multimethod implementation.
+
+
+What are multimethods?
+----------------------
+
 Multimethods provide a mechanism to dispatch function execution to different
 implementations of this function. It works similarly to the well-known concept
 of "instance methods" in OO languages like Python, which in a call to
