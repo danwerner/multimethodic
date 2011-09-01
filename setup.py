@@ -5,11 +5,11 @@
 from distutils.core import setup
 
 setup(
-    name         ='multimethods-py',
-    version      = '.1',
-    description  = 'clojure style multimethods for python',
-    author       = 'danwerner',
-    url          = 'https://github.com/danwerner/multimethods-py',
+    name         = 'multimethods',
+    version      = '0.1',
+    description  = 'Clojure-style multimethods for Python',
+    author       = 'Daniel Werner',
+    url          = 'http://github.com/danwerner/multimethods',
     py_modules   = ['multimethods'],
     entry_points = {},
 )
