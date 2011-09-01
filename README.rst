@@ -177,27 +177,42 @@ It is often used as an example to teach basic recursion.
         return 1 + len2(l[1:])
 
 
-Example: Dispatch on number sign
---------------------------------
+Example: Special procedures for special customers
+-------------------------------------------------
+
+Here's a slightly more involved example. Let's say ACME Corporation has
+standard billing procedures that apply to most of its customers, but some of
+the bigger customers receive wildly different conditions. How do we express
+this as code without resorting to heaps of `if` statements?
 
 ::
 
     from multimethods import MultiMethod, method, Default
-    
-    def signum(x):
-      "Returns -1, 0 or 1 to represent the sign of `x`."
-      return int(x >= 0) + int(x > 0) - 1
 
-    show_sign = MultiMethod('show_sign', signum)
+    def sum_amounts(purchase):
+        return sum(product.price for product in purchase)
 
-    @show_sign(-1)
-    def show_sign(x): print "%s is negative" % x
+    def get_customer(purchase):
+        return purchase.customer.company_name
 
-    @show_sign(0)
-    def show_sign(x): print "%s is zero" % x
+    calc_total = MultiMethod('calc_total', get_customer)
 
-    @show_sign(1)
-    def show_sign(x): print "%s is positive" % x
+    @method(Default)
+    def calc_total(purchase):
+        # Normal customer pricing
+        return sum_amounts(purchase)
+
+    @method("Wile E.")
+    def calc_total(purchase):
+        # Always gets 20% off
+        return sum_amounts(purchase * 0.8)
+
+    @method("Wolfram & Hart")
+    def calc_total(purchase):
+        # Has already paid an annual flat fee in advance; also receives
+        # a token of enduring friendship with every order
+        purchase.append(champagne)
+        return 0.0
 
 
 Author & License
