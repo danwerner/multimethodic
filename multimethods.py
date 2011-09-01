@@ -5,7 +5,7 @@
 An implementation of multimethods for Python, heavily influenced by
 the Clojure programming language.
 
-Copyright (C) 2010 by Daniel Werner.
+Copyright (C) 2010-2011 by Daniel Werner.
 
 See the README file for information on usage and redistribution.
 '''

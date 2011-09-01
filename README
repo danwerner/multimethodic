@@ -74,7 +74,7 @@ method implementation:
 Thus, we are going to dispatch on a tuple of types, namely the types of our
 arguments. The next step is to instantiate the MultiMethod itself:
 
-  from multimethod import MultiMethod, method, Default
+  from multimethods import MultiMethod, method, Default
 
   combine = MultiMethod('combine', combine_dispatch)
 
@@ -140,7 +140,7 @@ using the string-concatenating combine() implementation from above:
 This fails because type('foo') returns str, not basestring. I haven't found
 a way yet to allow this to work, short of checking all dispatch values for
 isinstance-ness in linear time or adding special cases to the code. If you have
-an idea how to implement this, great -- please contant me, or better yet,
+an idea how to implement this, great -- please contact me, or better yet,
 attach a patch :-)
 
 
@@ -151,7 +151,6 @@ This work has been created by and is copyrighted by Daniel Werner. All rights
 reserved, and that kind of stuff. You may freely use this work under the terms
 of the simplified (2-clause) version of the BSD license, a copy of which is
 included in this distribution.
-
 
 Credits & Thanks
 ----------------
@@ -167,3 +166,5 @@ macro-based syntax.  I'd like to thank the principal author of Clojure, Rich
 Hickey, for coming up with the idea to generalize multimethods to use a custom
 dispatch function, and for publishing his implementation so people can come
 along and rip...err... port it to other languages. Thanks, Rich!
+
+Thanks to Matthew von Rocketstein for providing me with a setup.py.
