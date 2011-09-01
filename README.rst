@@ -1,5 +1,5 @@
 Multimethods for Python
------------------------
+=======================
 
 This module adds multimethod support to the Python programming language.
 Multimethods provide a mechanism to dispatch function execution to different
@@ -49,7 +49,7 @@ Example: Dispatch on Argument Type
 ----------------------------------
 
 Without multimethods, naively implementing a function that has two different
-behaviours based on a the types of the arguments could look like this:
+behaviours based on a the types of the arguments could look like this::
 
   def combine(x, y):
       if isinstance(x, int) and isinstance(y, int):
@@ -66,45 +66,47 @@ combine() with exactly the same signature.
 
 First, we have to define a dispatch function. It will take the same arguments
 as the multimethod, and return a value which is then used to select the correct
-method implementation:
+method implementation::
 
-  def combine_dispatch(x, y):
-      return (type(x), type(y))
+    def combine_dispatch(x, y):
+        return (type(x), type(y))
 
 Thus, we are going to dispatch on a tuple of types, namely the types of our
-arguments. The next step is to instantiate the MultiMethod itself:
+arguments. The next step is to instantiate the MultiMethod itself::
 
-  from multimethods import MultiMethod, method, Default
-
-  combine = MultiMethod('combine', combine_dispatch)
+    from multimethods import MultiMethod, method, Default
+    
+    combine = MultiMethod('combine', combine_dispatch)
 
 A multimethod by itself does almost nothing. It is dependent on being given
 methods in order to implement its functionality for different dispatch values.
-Let's define methods for all-integer and all-string cases as above:
+Let's define methods for all-integer and all-string cases as above::
 
-  @method((int, int))
-  def combine(x, y):
-      return x*y
+    @method((int, int))
+    def combine(x, y):
+        return x*y
+    
+    @method((str, str))
+    def combine(x, y):
+        return x + '&' + y
+    
+    @method(Default)
+    def combine(x, y):
+        return 'Eh?'
 
-  @method((str, str))
-  def combine(x, y):
-      return x + '&' + y
+The behaviour for ints and strings is straightforward::
 
-  @method(Default)
-  def combine(x, y):
-      return 'Eh?'
-
-The behaviour for ints and strings is straightforward:
-
-  >>> combine(21, 2)
-  42
-  >>> combine('foo', 'bar')
-  'foo&bar'
+    >>> combine(21, 2)
+    42
+    >>> combine('foo', 'bar')
+    'foo&bar'
 
 However, notice the last method definition above. Instead of specifying a tuple
 of types, we have given it the special multimethods.Default object. This is
 a marker which simply tells the multimethod: "In case we don't have a method
 implementation for some dispatch value, just use this method instead."
+
+::
 
   >>> combine(21, 'bar')
   'Eh?'
@@ -114,10 +116,10 @@ all. An Exception will be raised for unknown dispatch values instead.
 
 Now would be a good time to show that the dispatch function's signature doesn't
 have to match methods' signature bit-by-bit. Let's refactor the dispatch
-function and make it more generic:
+function and make it more generic::
 
-  def dispatch_on_arg_type(*args):
-    return tuple(type(x) for x in args)
+    def dispatch_on_arg_type(*args):
+        return tuple(type(x) for x in args)
 
 This version will support all possible (non-variadic, non-keyword) signatures
 at no additional cost, and makes it easy to re-use the dispatch function for
@@ -129,15 +131,15 @@ Caveat
 
 A small stumbling block remains when dispatching on argument type: Comparing
 dispatch values is done via ==, not via isinstance(). This is best explained
-using the string-concatenating combine() implementation from above:
+using the string-concatenating combine() implementation from above::
 
-  @method((basestring, basestring))
-  def combine(x, y):
-      return x + '&' + y
+    @method((basestring, basestring))
+    def combine(x, y):
+        return x + '&' + y
+    
+    combine('foo', 'bar')   # BREAKS!
 
-  >>> combine('foo', 'bar')   # BREAKS!
-
-This fails because type('foo') returns str, not basestring. I haven't found
+This fails because type('foo') returns `str`, `not basestring`. I haven't found
 a way yet to allow this to work, short of checking all dispatch values for
 isinstance-ness in linear time or adding special cases to the code. If you have
 an idea how to implement this, great -- please contact me, or better yet,
@@ -151,6 +153,7 @@ This work has been created by and is copyrighted by Daniel Werner. All rights
 reserved, and that kind of stuff. You may freely use this work under the terms
 of the simplified (2-clause) version of the BSD license, a copy of which is
 included in this distribution.
+
 
 Credits & Thanks
 ----------------
