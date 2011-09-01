@@ -174,9 +174,9 @@ even more limited.
 
 This module however is really a near-faithful implementation of multimethods as
 found in the Clojure programming language (http://clojure.org), sans beautiful
-macro-based syntax.  I'd like to thank the principal author of Clojure, Rich
-Hickey, for coming up with the idea to generalize multimethods to use a custom
-dispatch function, and for publishing his implementation so people can come
-along and rip...err... port it to other languages. Thanks, Rich!
+macro-based syntax. I'd like to give credit to the principal author of
+Clojure, Rich Hickey, for coming up with the idea to generalize multimethods to
+use a custom dispatch function, and for publishing his implementation for the
+world to use (and port to different languages). Thanks, Rich!
 
 Thanks to Matthew von Rocketstein for providing me with a setup.py.
