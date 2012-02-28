@@ -32,3 +32,6 @@ class NamespaceTests(unittest.TestCase):
                 pass
         except KeyError:
             self.fail('not installing multimethods within namespace')
+
+if __name__ == '__main__':
+    unittest.main()
