@@ -5,7 +5,7 @@
 An implementation of multimethods for Python, heavily influenced by
 the Clojure programming language.
 
-Copyright (C) 2010-2011 by Daniel Werner.
+Copyright (C) 2010-2012 by Daniel Werner.
 
 See the README file for information on usage and redistribution.
 '''
@@ -52,11 +52,7 @@ class MultiMethod(object):
         self.methods[dispatchval] = func
 
     def removemethod(self, dispatchval):
-        del self.methods[dispatchval].multimethod
         del self.methods[dispatchval]
-
-    def methods(self):
-        return self.methods
 
     def __repr__(self):
         return "<MultiMethod '%s'>" % self.__name__
