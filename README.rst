@@ -230,7 +230,7 @@ Credits & Thanks
 
 While this Python module is new, the idea of multimethods is definitely not.
 Common Lisp has its generic functions, which only dispatch on type (and eql).
-There has also been a prior Python implementation by Guido Rossum, which is
+There has also been a prior Python implementation by Guido van Rossum, which is
 even more limited.
 
 This module however is really a near-faithful implementation of multimethods as
@@ -240,4 +240,5 @@ Clojure, Rich Hickey, for coming up with the idea to generalize multimethods to
 use a custom dispatch function, and for publishing his implementation for the
 world to use (and port to different languages). Thanks, Rich!
 
-Thanks to Matthew von Rocketstein for providing me with a setup.py.
+Thanks to Matthew von Rocketstein for providing me with a setup.py, and to Eric
+Shull for raising the issue of proper namespacing and implementing a solution.
