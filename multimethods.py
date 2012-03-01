@@ -21,7 +21,9 @@ Default = DefaultMethod()
 class MultiMethod(object):
     instances = {}
 
-    def __init__(self, name, dispatchfn):
+    def __init__(self, name, dispatchfn, ns):
+        name = '%s.%s' % (ns, name)
+
         if not callable(dispatchfn):
             raise TypeError('dispatchfn must be callable')
 
@@ -60,7 +62,7 @@ class MultiMethod(object):
         return "<MultiMethod '%s'>" % self.__name__
 
 
-def method(dispatchval):
+def method(dispatchval, ns):
     def method_decorator(func):
         '''Decorator which registers a function as a new method of a like-named multimethod,
         keyed by dispatchval.
@@ -68,10 +70,12 @@ def method(dispatchval):
         The multimethod is determined by taking the method's name up to the last occurence
         of '__', e.g. function foo_bar__zig will become a method on the foo_bar multimethod.'''
 
+        name = '%s.%s' % (ns, func.__name__)
+
         try:
-            multim = MultiMethod.instances[func.__name__]
+            multim = MultiMethod.instances[name]
         except KeyError:
-            raise KeyError("Multimethod '%s' not found; it must exist before methods can be added")
+            raise KeyError("Multimethod '%s' not found; it must exist before methods can be added" % name)
 
         multim.addmethod(func, dispatchval)
 
