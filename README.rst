@@ -17,7 +17,7 @@ of "instance methods" in OO languages like Python, which in a call to
 obj.method() would look up a member called "method" in obj's class.
 
 However, multimethod methods are NOT neccessarily associated with a single
-class. Instead, they belong to a MultiMethod instance. Calls on the MultiMethod
+class. Instead, they belong to a `MultiMethod` instance. Calls on the MultiMethod
 will be dispatched to its corresponding methods using a custom, user-defined
 dispatch function.
 
@@ -26,14 +26,15 @@ dispatch function will receive the exact arguments the MultiMethod call
 received, and is expected to return a value that will be dispatched on. This
 return value is then used to select a 'method', which is basically just
 a function that has been associated with this multimethod and dispatch value
-using the @method decorator.
+using the multimethod's `@method` decorator.
 
 Note that in the dispatch function lies the real power of this whole concept.
 For example, you can use it to dispatch on the type of the arguments like in
 Java/C, on their exact values, or whether they evaluate to True in a boolean
 context. If the arguments are dictionaries, you can dispatch on whether they
-contain certain keys. Or, if you're going really wild, you could even send them
-over the network to a remote service and let that decide which method to call.
+contain certain keys. Or, if you want to go really wild, you could even send
+these arguments over the network to a remote service and let that decide which
+method to call.
 
 Of course, not every possible application of multimethods is actually useful,
 but your creativity is the only limit to what you can do.
@@ -42,14 +43,14 @@ but your creativity is the only limit to what you can do.
 How to use multimethods
 -----------------------
 
-To use multimethods, a MultiMethod instance must be created first. Each
+To use multimethods, a `MultiMethod` instance must be created first. Each
 MultiMethod instance takes a name and a dispatch function, as discussed above.
 
-Methods are associated with MultiMethods by decorating a function with the
-@method decorator. The function needs to have the same name as the MultiMethod.
-The @method decorator takes a dispatch value which signals to the MultiMethod
-that whenever its dispatch function returns this value, this method should be
-selected.
+Methods are associated with MultiMethods by decorating a function using the
+`@method` decorator, which is an attribute of the multimethod itself. This
+decorator registers the function for a dispatch value so that whenever the
+MultiMethod is called and its dispatch function returns this value, the
+decorated function will be selected.
 
 Okay, that was dry enough. Let's put this concept to work with a small example:
 
@@ -71,35 +72,35 @@ behaviours based on a the types of the arguments could look like this::
 However, this is ugly and becomes unwieldy fast as we add more elif cases for
 additional types. Fortunately, implementing dispatch on function arguments'
 types is easy using multimethods. Let's implement a multimethod version of
-combine() with exactly the same signature.
+`combine()` with exactly the same signature.
 
 First, we have to define a dispatch function. It will take the same arguments
 as the multimethod, and return a value which is then used to select the correct
 method implementation::
 
-    def combine_dispatch(x, y):
+    def dispatch_combine(x, y):
         return (type(x), type(y))
 
 Thus, we are going to dispatch on a tuple of types, namely the types of our
 arguments. The next step is to instantiate the MultiMethod itself::
 
-    from multimethods import MultiMethod, method, Default
+    from multimethods import MultiMethod, Default
     
-    combine = MultiMethod('combine', combine_dispatch)
+    combine = MultiMethod('combine', dispatch_combine)
 
 A multimethod by itself does almost nothing. It is dependent on being given
 methods in order to implement its functionality for different dispatch values.
 Let's define methods for all-integer and all-string cases as above::
 
-    @method((int, int))
+    @combine.method((int, int))
     def combine(x, y):
         return x * y
     
-    @method((str, str))
+    @combine.method((str, str))
     def combine(x, y):
         return x + '&' + y
     
-    @method(Default)
+    @combine.method(Default)
     def combine(x, y):
         return '???'
 
@@ -113,19 +114,18 @@ The behaviour for ints and strings is straightforward::
 However, notice the last method definition above. Instead of specifying a tuple
 of types, we have given it the special multimethods.Default object. This is
 a marker which simply tells the multimethod: "In case we don't have a method
-implementation for some dispatch value, just use this method instead."
-
-::
+implementation for some dispatch value, just use this method instead." Let's
+test it::
 
   >>> combine(21, 'bar')
   '???'
 
 Default methods are completely optional, you are free not to provide one at
-all. An Exception will be raised for unknown dispatch values instead.
+all. An `Exception` will be raised for unknown dispatch values instead.
 
 Now would be a good time to show that the dispatch function's signature doesn't
-have to match methods' signature bit-by-bit. Let's refactor the dispatch
-function and make it more generic::
+have to match its methods' signature bit-by-bit. Let's make the dispatch
+function more generic::
 
     def dispatch_on_arg_type(*args):
         return tuple(type(x) for x in args)
@@ -139,28 +139,30 @@ Caveat
 ******
 
 A small stumbling block remains when dispatching on argument type: Comparing
-dispatch values is done via ==, not via isinstance(). This is best explained
-using the string-concatenating combine() implementation from above::
+dispatch values is done via `==`, not via `isinstance()`. This is best explained
+using the string-concatenating `combine()` implementation from above::
 
-    @method((basestring, basestring))
+    @combine.method((basestring, basestring))
     def combine(x, y):
         return x + '&' + y
     
     combine('foo', 'bar')   # BREAKS!
 
-This fails because type('foo') returns `str`, `not basestring`. I haven't found
-a way yet to allow this to work, short of checking all dispatch values for
-isinstance-ness in linear time or adding special cases to the code. If you have
-an idea how to implement this, great -- please contact me, or better yet,
-attach a patch :-)
+This fails because `type('foo')` returns `str`, not `basestring`. I haven't yet
+found a way to allow this to work, short of checking all dispatch values for
+`isinstance`-ness in linear time or adding special cases to the code. If you have
+an idea how to implement this, great -- please contact me or, better yet, send a
+pull request :-)
+
+At any rate, dispatching on argument type is not the end of the story.
 
 
 Example: Poor man's pattern matching
 ------------------------------------
 
 What follows is a horribly inefficient algorithm to determine a list's length.
-It is often used as an example to teach basic recursion, and also goes to show
-how the edge case can be modeled using simple pattern matching.
+It is often used as an example to teach basic recursion, and also shows how edge
+cases can be modeled using simple pattern matching.
 
 ::
 
@@ -169,11 +171,11 @@ how the edge case can be modeled using simple pattern matching.
     identity = lambda x: x
     len2 = MultiMethod('len2', identity)
 
-    @method([])
+    @len2.method([])
     def len2(l):
         return 0
 
-    @method(Default)
+    @len2.method(Default)
     def len2(l):
         return 1 + len2(l[1:])
 
@@ -184,7 +186,7 @@ Example: Special procedures for special customers
 Here's a slightly more involved example. Let's say ACME Corporation has
 standard billing procedures that apply to most of its customers, but some of
 the bigger customers receive wildly different conditions. How do we express
-this as code without resorting to heaps of `if` statements?
+this in code without resorting to heaps of `if` statements?
 
 ::
 
@@ -197,6 +199,7 @@ this as code without resorting to heaps of `if` statements?
         return purchase.customer.company_name
 
     calc_total = MultiMethod('calc_total', get_customer)
+    method = calc_total.method
 
     @method(Default)
     def calc_total(purchase):

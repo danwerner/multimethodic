@@ -19,22 +19,13 @@ Default = DefaultMethod()
 
 
 class MultiMethod(object):
-    instances = {}
-
-    def __init__(self, name, dispatchfn, ns):
-        name = '%s.%s' % (ns, name)
-
+    def __init__(self, name, dispatchfn):
         if not callable(dispatchfn):
             raise TypeError('dispatchfn must be callable')
 
-        if name in self.__class__.instances:
-            raise Exception("A multimethod '%s' already exists, "
-                            "redeclaring it would wreak havoc" % name)
-
         self.dispatchfn = dispatchfn
         self.methods = {}
-        self.__name__ = name
-        self.__class__.instances[name] = self
+        self.name = name
 
     def __call__(self, *args, **kwds):
         dv = self.dispatchfn(*args, **kwds)
@@ -46,7 +37,7 @@ class MultiMethod(object):
             return self.methods[Default](*args, **kwds)
 
         raise Exception("No matching method on multimethod '%s' and "
-                        "no default method defined" % self.__name__)
+                        "no default method defined" % self.name)
 
     def addmethod(self, func, dispatchval):
         self.methods[dispatchval] = func
@@ -54,26 +45,22 @@ class MultiMethod(object):
     def removemethod(self, dispatchval):
         del self.methods[dispatchval]
 
+    def method(self, dispatchval):
+        ''' Decorates a function as a new method of this multimethod, to be
+            invoked when the dispatch function returns `dispatchval`.
+
+            The return value is the MultiMethod itself.
+        '''
+
+        def method_decorator(func):
+            self.addmethod(func, dispatchval)
+            # Return the multimethod itself
+            return self
+
+        return method_decorator
+
     def __repr__(self):
-        return "<MultiMethod '%s'>" % self.__name__
+        return "<%s '%s'>" % (type(self).__name__, self.name)
 
 
-def method(dispatchval, ns):
-    def method_decorator(func):
-        '''Decorator which registers a function as a new method of a like-named multimethod,
-        keyed by dispatchval.'''
-
-        name = '%s.%s' % (ns, func.__name__)
-
-        try:
-            multim = MultiMethod.instances[name]
-        except KeyError:
-            raise KeyError("Multimethod '%s' not found; it must exist before methods can be added" % name)
-
-        multim.addmethod(func, dispatchval)
-
-        return multim
-
-    return method_decorator
-
-__all__ = ['MultiMethod', 'method', 'Default']
+__all__ = ['MultiMethod', 'Default']
