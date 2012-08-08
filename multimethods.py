@@ -61,10 +61,7 @@ class MultiMethod(object):
 def method(dispatchval, ns):
     def method_decorator(func):
         '''Decorator which registers a function as a new method of a like-named multimethod,
-        keyed by dispatchval.
-
-        The multimethod is determined by taking the method's name up to the last occurence
-        of '__', e.g. function foo_bar__zig will become a method on the foo_bar multimethod.'''
+        keyed by dispatchval.'''
 
         name = '%s.%s' % (ns, func.__name__)
 
