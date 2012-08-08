@@ -64,9 +64,9 @@ behaviours based on a the types of the arguments could look like this::
       if isinstance(x, int) and isinstance(y, int):
           return x * y
       elif isinstance(x, basestring) and isinstance(y, basestring):
-          return x + ', ' + y
+          return x + '&' + y
       else:
-          return None
+          return '???'
 
 However, this is ugly and becomes unwieldy fast as we add more elif cases for
 additional types. Fortunately, implementing dispatch on function arguments'
@@ -93,7 +93,7 @@ Let's define methods for all-integer and all-string cases as above::
 
     @method((int, int))
     def combine(x, y):
-        return x*y
+        return x * y
     
     @method((str, str))
     def combine(x, y):
@@ -101,7 +101,7 @@ Let's define methods for all-integer and all-string cases as above::
     
     @method(Default)
     def combine(x, y):
-        return 'Eh?'
+        return '???'
 
 The behaviour for ints and strings is straightforward::
 
@@ -118,7 +118,7 @@ implementation for some dispatch value, just use this method instead."
 ::
 
   >>> combine(21, 'bar')
-  'Eh?'
+  '???'
 
 Default methods are completely optional, you are free not to provide one at
 all. An Exception will be raised for unknown dispatch values instead.
