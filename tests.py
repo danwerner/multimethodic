@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 from nose.tools import assert_equal, assert_raises
-from multimethods import MultiMethod, Default
+from multimethodic import MultiMethod, Default
 
 identity = lambda x: x
 

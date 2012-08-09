@@ -1,5 +1,5 @@
-Multimethods for Python
-=======================
+multimethodic - Multimethods for Python
+======================================
 
 This module adds multimethod support to the Python programming language. In
 contrast to other multiple dispatch implementations, this one doesn't strictly
@@ -71,7 +71,7 @@ behaviours based on a the types of the arguments could look like this::
 
 However, this is ugly and becomes unwieldy fast as we add more elif cases for
 additional types. Fortunately, implementing dispatch on function arguments'
-types is easy using multimethods. Let's implement a multimethod version of
+types is easy using multimethodic. Let's implement a multimethod version of
 `combine()` with exactly the same signature.
 
 First, we have to define a dispatch function. It will take the same arguments
@@ -84,7 +84,7 @@ method implementation::
 Thus, we are going to dispatch on a tuple of types, namely the types of our
 arguments. The next step is to instantiate the MultiMethod itself::
 
-    from multimethods import MultiMethod, Default
+    from multimethodic import MultiMethod, Default
     
     combine = MultiMethod('combine', dispatch_combine)
 
@@ -112,7 +112,7 @@ The behaviour for ints and strings is straightforward::
     'foo&bar'
 
 However, notice the last method definition above. Instead of specifying a tuple
-of types, we have given it the special multimethods.Default object. This is
+of types, we have given it the special `multimethodic.Default` object. This is
 a marker which simply tells the multimethod: "In case we don't have a method
 implementation for some dispatch value, just use this method instead." Let's
 test it::
@@ -166,7 +166,7 @@ cases can be modeled using simple pattern matching.
 
 ::
 
-    from multimethods import MultiMethod, method, Default
+    from multimethodic import MultiMethod, method, Default
 
     identity = lambda x: x
     len2 = MultiMethod('len2', identity)
@@ -190,7 +190,7 @@ this in code without resorting to heaps of `if` statements?
 
 ::
 
-    from multimethods import MultiMethod, method, Default
+    from multimethodic import MultiMethod, method, Default
 
     def sum_amounts(purchase):
         return sum(product.price for product in purchase)

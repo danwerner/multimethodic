@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-""" setup.py for multimethods
+""" setup.py for multimethodic
 """
 
 from distutils.core import setup
 
 setup(
-    name         = 'multimethods',
+    name         = 'multimethodic',
     version      = '1.0',
     description  = 'Clojure-style multimethods for Python',
     author       = 'Daniel Werner',
@@ -17,8 +17,8 @@ setup(
         "Topic :: Utilities",
         "License :: OSI Approved :: BSD License",
     ],
-    url          = 'http://github.com/danwerner/multimethods',
-    py_modules   = ['multimethods'],
+    url          = 'http://github.com/danwerner/multimethodic',
+    py_modules   = ['multimethodic'],
 
     long_description = "This module adds multimethod support to the Python programming language. In \
 contrast to other multiple dispatch implementations, this one doesn't strictly \

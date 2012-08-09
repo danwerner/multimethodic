@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-''' Multimethods
+''' Multimethodic
 
 An implementation of multimethods for Python, heavily influenced by
 the Clojure programming language.
