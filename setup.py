@@ -19,4 +19,10 @@ setup(
     ],
     url          = 'http://github.com/danwerner/multimethods',
     py_modules   = ['multimethods'],
+
+    long_description = "This module adds multimethod support to the Python programming language. In \
+contrast to other multiple dispatch implementations, this one doesn't strictly \
+dispatch on argument types, but on a user-provided dispatch function that can \
+differ for each multimethod. This design is inspired the Clojure programming \
+language's multimethods.",
 )
