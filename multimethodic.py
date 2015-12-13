@@ -28,13 +28,18 @@ class DispatchError(Exception):
 
 
 class MultiMethod(object):
+    ''' A multimethod that when called, dispatches to one of its
+        registered method implementations depending on the return
+        value of a custom dispatcher function.
+    '''
     def __init__(self, name, dispatchfn):
         if not callable(dispatchfn):
             raise TypeError('dispatchfn must be callable')
 
-        self.dispatchfn = dispatchfn
-        self.methods = {}
         self.name = name
+        self.dispatchfn = dispatchfn
+
+        self.methods = {}
 
     def __call__(self, *args, **kwds):
         dv = self.dispatchfn(*args, **kwds)
