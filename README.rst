@@ -14,10 +14,10 @@ What are multimethods?
 Multimethods provide a mechanism to dispatch function execution to different
 implementations of this function. It works similarly to the well-known concept
 of "instance methods" in OO languages like Python, which in a call to
-obj.method() would look up a member called "method" in obj's class.
+``obj.method()`` would look up a member called "method" in obj's class.
 
 However, multimethod methods are NOT neccessarily associated with a single
-class. Instead, they belong to a `MultiMethod` instance. Calls on the MultiMethod
+class. Instead, they belong to a ``MultiMethod`` instance. Calls on the MultiMethod
 will be dispatched to its corresponding methods using a custom, user-defined
 dispatch function.
 
@@ -26,7 +26,7 @@ dispatch function will receive the exact arguments the MultiMethod call
 received, and is expected to return a value that will be dispatched on. This
 return value is then used to select a 'method', which is basically just
 a function that has been associated with this multimethod and dispatch value
-using the multimethod's `@method` decorator.
+using the multimethod's ``@method`` decorator.
 
 Note that in the dispatch function lies the real power of this whole concept.
 For example, you can use it to dispatch on the type of the arguments like in
@@ -43,11 +43,11 @@ but your creativity is the only limit to what you can do.
 How to use multimethods
 -----------------------
 
-To use multimethods, a `MultiMethod` instance must be created first. Each
+To use multimethods, a ``MultiMethod`` instance must be created first. Each
 MultiMethod instance takes a name and a dispatch function, as discussed above.
 
 Methods are associated with MultiMethods by decorating a function using the
-`@method` decorator, which is an attribute of the multimethod itself. This
+``@method`` decorator, which is an attribute of the multimethod itself. This
 decorator registers the function for a dispatch value so that whenever the
 MultiMethod is called and its dispatch function returns this value, the
 decorated function will be selected.
@@ -72,7 +72,7 @@ behaviours based on a the types of the arguments could look like this::
 However, this is ugly and becomes unwieldy fast as we add more elif cases for
 additional types. Fortunately, implementing dispatch on function arguments'
 types is easy using multimethodic. Let's implement a multimethod version of
-`combine()` with exactly the same signature.
+``combine()`` with exactly the same signature.
 
 First, we have to define a dispatch function. It will take the same arguments
 as the multimethod, and return a value which is then used to select the correct
@@ -112,7 +112,7 @@ The behaviour for ints and strings is straightforward::
     'foo&bar'
 
 However, notice the last method definition above. Instead of specifying a tuple
-of types, we have given it the special `multimethodic.Default` object. This is
+of types, we have given it the special ``multimethodic.Default`` object. This is
 a marker which simply tells the multimethod: "In case we don't have a method
 implementation for some dispatch value, just use this method instead." Let's
 test it::
@@ -121,7 +121,7 @@ test it::
   '???'
 
 Default methods are completely optional, you are free not to provide one at
-all. A `multimethodic.DispatchError` will be raised for unknown dispatch values
+all. A ``multimethodic.DispatchError`` will be raised for unknown dispatch values
 instead::
 
     >>> combine(21, 'bar')
@@ -145,8 +145,8 @@ Caveat
 ******
 
 A small stumbling block remains when dispatching on argument type: Comparing
-dispatch values is done via `==`, not via `isinstance()`. This is best explained
-using the string-concatenating `combine()` implementation from above::
+dispatch values is done via ``==``, not via ``isinstance()``. This is best explained
+using the string-concatenating ``combine()`` implementation from above::
 
     @combine.method((basestring, basestring))
     def combine(x, y):
@@ -154,9 +154,9 @@ using the string-concatenating `combine()` implementation from above::
     
     combine('foo', 'bar')   # BREAKS!
 
-This fails because `type('foo')` returns `str`, not `basestring`. I haven't yet
+This fails because ``type('foo')`` returns ``str``, not ``basestring``. I haven't yet
 found a way to allow this to work, short of checking all dispatch values for
-`isinstance`-ness in linear time or adding special cases to the code. If you have
+``isinstance``-ness in linear time or adding special cases to the code. If you have
 an idea how to implement this, great -- please contact me or, better yet, send a
 pull request :-)
 
@@ -192,7 +192,7 @@ Example: Special procedures for special customers
 Here's a slightly more involved example. Let's say ACME Corporation has
 standard billing procedures that apply to most of its customers, but some of
 the bigger customers receive wildly different conditions. How do we express
-this in code without resorting to heaps of `if` statements?
+this in code without resorting to heaps of ``if`` statements?
 
 ::
 
