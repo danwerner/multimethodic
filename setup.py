@@ -9,7 +9,7 @@ setup(
     version      = '1.0',
     description  = 'Clojure-style multimethods for Python',
     author       = 'Daniel Werner',
-    author_email = 'daniel.d.werner@googlemail.com',
+    author_email = 'daniel.d.werner@gmail.com',
     license      = 'BSD 2-clause',
     keywords     = 'multimethods dispatch',
     classifiers  = [
@@ -17,7 +17,7 @@ setup(
         "Topic :: Utilities",
         "License :: OSI Approved :: BSD License",
     ],
-    url          = 'http://github.com/danwerner/multimethodic',
+    url          = 'https://github.com/danwerner/multimethodic',
     py_modules   = ['multimethodic'],
 
     long_description = "This module adds multimethod support to the Python programming language. In \
