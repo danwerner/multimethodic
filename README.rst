@@ -121,7 +121,13 @@ test it::
   '???'
 
 Default methods are completely optional, you are free not to provide one at
-all. An `Exception` will be raised for unknown dispatch values instead.
+all. A `multimethodic.DispatchError` will be raised for unknown dispatch values
+instead::
+
+    >>> combine(21, 'bar')
+    Traceback (most recent call last):
+    ...
+    DispatchError: No matching method on multimethod 'combine' and no default method defined
 
 Now would be a good time to show that the dispatch function's signature doesn't
 have to match its methods' signature bit-by-bit. Let's make the dispatch

@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 from nose.tools import assert_equal, assert_raises
-from multimethodic import MultiMethod, Default
+from multimethodic import MultiMethod, Default, DispatchError
 
 identity = lambda x: x
 
@@ -39,7 +39,7 @@ def test_addmethod():
 
     assert_equal(foomethod(42), "The Answer")
     assert_equal(foomethod(1024), "2^10")
-    assert_equal(foomethod(Default), "Nothing")
+    assert_equal(foomethod(123), "Nothing")
 
 
 def test_removemethod():
@@ -52,7 +52,7 @@ def test_removemethod():
     assert_equal(barmethod(1), 123)
 
     barmethod.removemethod(1)
-    assert_raises(Exception, lambda: barmethod(1))
+    assert_raises(DispatchError, lambda: barmethod(1))
 
     @barmethod.method(Default)
     def barmethod(x):
@@ -62,8 +62,8 @@ def test_removemethod():
     assert_equal(barmethod("something"), 42)
 
     barmethod.removemethod(Default)
-    assert_raises(Exception, lambda: barmethod("whatever"))
-    assert_raises(Exception, lambda: barmethod(1))
+    assert_raises(DispatchError, lambda: barmethod("whatever"))
+    assert_raises(DispatchError, lambda: barmethod(1))
 
 
 def test_name_conflict():

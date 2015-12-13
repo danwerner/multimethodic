@@ -18,6 +18,15 @@ class DefaultMethod(object):
 Default = DefaultMethod()
 
 
+class DispatchError(Exception):
+    ''' Raised when a multimethod call cannot be dispatched to
+        any method.
+    '''
+    def __init__(self, msg, name):
+        super(DispatchError, self).__init__(msg)
+        self.name = name
+
+
 class MultiMethod(object):
     def __init__(self, name, dispatchfn):
         if not callable(dispatchfn):
@@ -36,8 +45,8 @@ class MultiMethod(object):
         if Default in self.methods:
             return self.methods[Default](*args, **kwds)
 
-        raise Exception("No matching method on multimethod '%s' and "
-                        "no default method defined" % self.name)
+        raise DispatchError("No matching method on multimethod '%s' and "
+                            "no default method defined" % self.name, self.name)
 
     def addmethod(self, func, dispatchval):
         self.methods[dispatchval] = func
